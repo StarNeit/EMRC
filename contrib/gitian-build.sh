@@ -17,7 +17,7 @@ osx=true
 SIGNER=
 VERSION=
 commit=false
-url=https://github.com/216k155/lux
+url=https://github.com/StarNeit/Emercury
 proc=2
 mem=2000
 lxc=true
@@ -184,8 +184,6 @@ done
 if [[ $lxc = true ]]
 then
     export USE_LXC=1
-    export LXC_BRIDGE=lxcbr0
-    sudo ifconfig lxcbr0 up 10.0.2.2
 fi
 
 # Check for OSX SDK
@@ -252,7 +250,7 @@ then
 fi
 
 # Set up build
-pushd ./lux
+pushd ./Emercury
 git fetch
 git checkout ${COMMIT}
 popd
@@ -261,7 +259,7 @@ popd
 if [[ $build = true ]]
 then
 	# Make output folder
-	mkdir -p ./lux/${VERSION}
+	mkdir -p ./lux-binaries/${VERSION}
 
 	# Build Dependencies
 	echo ""
@@ -271,64 +269,64 @@ then
 	mkdir -p inputs
 	wget -N -P inputs $osslPatchUrl
 	wget -N -P inputs $osslTarUrl
-	make -C ../lux/depends download SOURCES_PATH=`pwd`/cache/common
+	make -C ../Emercury/depends download SOURCES_PATH=`pwd`/cache/common
 
 	# Linux
-	if [[ $linux = true ]]
-	then
-            echo ""
-	    echo "Compiling ${VERSION} Linux"
-	    echo ""
-	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-linux.yml
-	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-linux.yml
-	    mv build/out/lux-*.tar.gz build/out/src/lux-*.tar.gz ../lux-binaries/${VERSION}
-	fi
+#	if [[ $linux = true ]]
+#	then
+#            echo ""
+#	    echo "Compiling ${VERSION} Linux"
+#	    echo ""
+#	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-linux.yml
+#	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-linux.yml
+#	    mv build/out/lux-*.tar.gz build/out/src/lux-*.tar.gz ../lux-binaries/${VERSION}
+#	fi
 	# Windows
 	if [[ $windows = true ]]
 	then
 	    echo ""
 	    echo "Compiling ${VERSION} Windows"
 	    echo ""
-	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-win.yml
-	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-win.yml
+	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../Emercury/contrib/gitian-descriptors/gitian-win.yml
+	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../Emercury/contrib/gitian-descriptors/gitian-win.yml
 	    mv build/out/lux-*-win-unsigned.tar.gz inputs/lux-win-unsigned.tar.gz
 	    mv build/out/lux-*.zip build/out/lux-*.exe ../lux-binaries/${VERSION}
 	fi
 	# Mac OSX
-	if [[ $osx = true ]]
-	then
-	    echo ""
-	    echo "Compiling ${VERSION} Mac OSX"
-	    echo ""
-	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-osx.yml
-	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-osx.yml
-	    mv build/out/lux-*-osx-unsigned.tar.gz inputs/lux-osx-unsigned.tar.gz
-	    mv build/out/lux-*.tar.gz build/out/lux-*.dmg ../lux-binaries/${VERSION}
-	fi
-	if [[ $aarch64 = true ]]
-    	then
-    	    echo ""
-    	    echo "Compiling ${VERSION} AArch64"
-    	    echo ""
-    	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-aarch64.yml
-    	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-aarch64 --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-aarch64.yml
-    	    mv build/out/lux-*.tar.gz build/out/src/lux-*.tar.gz ../lux-binaries/${VERSION}
-	popd
+#	if [[ $osx = true ]]
+#	then
+#	    echo ""
+#	    echo "Compiling ${VERSION} Mac OSX"
+#	    echo ""
+#	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-osx.yml
+#	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-osx.yml
+#	    mv build/out/lux-*-osx-unsigned.tar.gz inputs/lux-osx-unsigned.tar.gz
+#	    mv build/out/lux-*.tar.gz build/out/lux-*.dmg ../lux-binaries/${VERSION}
+#	fi
+#	if [[ $aarch64 = true ]]
+#   	then
+#    	    echo ""
+#    	    echo "Compiling ${VERSION} AArch64"
+#    	    echo ""
+#    	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-aarch64.yml
+#    	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-aarch64 --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-aarch64.yml
+#    	    mv build/out/lux-*.tar.gz build/out/src/lux-*.tar.gz ../lux-binaries/${VERSION}
+#	popd
 
-        if [[ $commitFiles = true ]]
-        then
-	    # Commit to gitian.sigs repo
-            echo ""
-            echo "Committing ${VERSION} Unsigned Sigs"
-            echo ""
-            pushd gitian.sigs
-            git add ${VERSION}-linux/${SIGNER}
-            git add ${VERSION}-aarch64/${SIGNER}
-            git add ${VERSION}-win-unsigned/${SIGNER}
-            git add ${VERSION}-osx-unsigned/${SIGNER}
-            git commit -a -m "Add ${VERSION} unsigned sigs for ${SIGNER}"
-            popd
-        fi
+#        if [[ $commitFiles = true ]]
+#        then
+#	    # Commit to gitian.sigs repo
+#            echo ""
+#            echo "Committing ${VERSION} Unsigned Sigs"
+#            echo ""
+#            pushd gitian.sigs
+#            git add ${VERSION}-linux/${SIGNER}
+#            git add ${VERSION}-aarch64/${SIGNER}
+#            git add ${VERSION}-win-unsigned/${SIGNER}
+#            git add ${VERSION}-osx-unsigned/${SIGNER}
+#            git commit -a -m "Add ${VERSION} unsigned sigs for ${SIGNER}"
+#            popd
+#        fi
 fi
 
 # Verify the build
@@ -385,27 +383,27 @@ then
 	    mv build/out/lux-*win32-setup.exe ../lux-binaries/${VERSION}
 	fi
 	# Sign Mac OSX
-	if [[ $osx = true ]]
-	then
-	    echo ""
-	    echo "Signing ${VERSION} Mac OSX"
-	    echo ""
-	    ./bin/gbuild -i --commit signature=${COMMIT} ../lux/contrib/gitian-descriptors/gitian-osx-signer.yml
-	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-osx-signer.yml
-	    mv build/out/lux-osx-signed.dmg ../lux-binaries/${VERSION}/lux-${VERSION}-osx.dmg
-	fi
-	popd
+#	if [[ $osx = true ]]
+#	then
+#	    echo ""
+#	    echo "Signing ${VERSION} Mac OSX"
+#	    echo ""
+#	    ./bin/gbuild -i --commit signature=${COMMIT} ../lux/contrib/gitian-descriptors/gitian-osx-signer.yml
+#	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-osx-signer.yml
+#	    mv build/out/lux-osx-signed.dmg ../lux-binaries/${VERSION}/lux-${VERSION}-osx.dmg
+#	fi
+#	popd
 
-        if [[ $commitFiles = true ]]
-        then
-            # Commit Sigs
-            pushd gitian.sigs
-            echo ""
-            echo "Committing ${VERSION} Signed Sigs"
-            echo ""
-            git add ${VERSION}-win-signed/${SIGNER}
-            git add ${VERSION}-osx-signed/${SIGNER}
-            git commit -a -m "Add ${VERSION} signed binary sigs for ${SIGNER}"
-            popd
-        fi
+#        if [[ $commitFiles = true ]]
+#        then
+#            # Commit Sigs
+#            pushd gitian.sigs
+#            echo ""
+#            echo "Committing ${VERSION} Signed Sigs"
+#            echo ""
+#            git add ${VERSION}-win-signed/${SIGNER}
+#            git add ${VERSION}-osx-signed/${SIGNER}
+#            git commit -a -m "Add ${VERSION} signed binary sigs for ${SIGNER}"
+#            popd
+#        fi
 fi
